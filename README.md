@@ -6,23 +6,21 @@ Projeto voltado para a solução da demanda de professores e alunos do MédioTec
 
 As instruções a seguir permitirão que você obtenha uma cópia do projeto em operação na sua máquina local para fins de desenvolvimento e teste.
 
-### 📋 Pré-requisitos (Em construção...)
+### 📋 Pré-requisitos
 
 ```
-Versão mais recente do [Node.js](https://nodejs.org/pt) instalada no seu computador
-```
-
-```
-Pacote [Maven](https://maven.apache.org) e o JDK instalado na versão mais recente
+Versão mais recente do Node.js instalada no seu computador
 ```
 
 ```
-Extensão "Spring Boot Extension Pack" no VsCode para utilizar o Spring
+Pacote Maven e o JDK instalado na versão mais recente
 ```
 
-### 🔧 Instalação (Em construção...)
+```
+Extensão "Spring Boot Extension Pack" no VsCode para utilizar o Spring (Recomendado)
+```
 
-Uma série de exemplos passo-a-passo que informam o que você deve executar para ter um ambiente de desenvolvimento em execução.
+### 🔧 Instalação
 
 O primeiro passo é instalar as dependências do projeto (tenha certeza de estar na pasta raiz do projeto):
 
@@ -30,14 +28,11 @@ O primeiro passo é instalar as dependências do projeto (tenha certeza de estar
 npm install
 ```
 
-E repita:
+Após isso basta apenas rodar o código com:
 
 ```
-Até finalizar
+npm run build
 ```
-
-Com isso o sistema deverá abrir em outra página web e funcionar
-
 
 ## 🛠️ Construído com
 
