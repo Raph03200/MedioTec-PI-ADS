@@ -13,6 +13,10 @@ Versão mais recente do Node.js instalada no seu computador
 ```
 
 ```
+Java 17, Maven 3.x, MySQL instalados
+```
+
+```
 Extensão "Spring Boot Extension Pack" no VsCode para utilizar o Spring (Recomendado)
 ```
 
@@ -48,6 +52,7 @@ npm run build
 ## 📄 Documentação
 
 * [Documentação Front-End](https://docs.google.com/document/d/1Qv1lMFxMQ07IZ9qCdYoNzCE7V68DDCHATLW3RWfs4U4/edit?usp=sharing)
+* [Documentação Back-End](https://github.com/Raph03200/MedioTec-PI-ADS/blob/main/backend/README.md)
 * [Rotas Back-End](https://www.postman.com/super-grupo/super-grupo-workspace/request/mdvwttf/localhost-8080-login)
 
 ## 📌 Versão
