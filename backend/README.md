@@ -10,6 +10,7 @@ JWT (JSON Web Token): Autenticação e autorização.
 Maven: Gerenciador de dependências.
 
 📦 Estrutura do Projeto:
+
 src
 ├── main
 │   ├── java
@@ -25,6 +26,7 @@ src
 │   │   ├── application.properties  # Configurações do banco de dados e Spring
 │   │   └── static                  # Arquivos estáticos (CSS, JS)
 └── pom.xml                         # Arquivo de dependências Maven
+
 
 
 🛠️ Pré-requisitos
