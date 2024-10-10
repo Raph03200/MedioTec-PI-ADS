@@ -34,7 +34,7 @@ Antes de iniciar, certifique-se de ter os seguintes itens instalados em sua máq
 
 * Java 17
 * Maven 3.x
-* MySQL
+* Postgres
 
 ## ⚙️ Configuração
 
