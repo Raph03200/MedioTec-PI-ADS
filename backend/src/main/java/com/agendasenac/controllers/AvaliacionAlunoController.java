@@ -1,28 +1,18 @@
 package com.agendasenac.controllers;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.ReflectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.bind.annotation.*;
 
 import com.agendasenac.modells.AvaliandoALuno;
-import com.agendasenac.modells.Disciplinas;
 import com.agendasenac.modells.UserSistema;
 import com.agendasenac.repository.AvaliacionALunoRepository;
 import com.agendasenac.repository.UserSistemaRepository;
@@ -30,143 +20,110 @@ import com.agendasenac.repository.UserSistemaRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestController
-public class AvaliacionAlunoController{
-	
-	@Autowired
-	private AvaliacionALunoRepository Aar;
-	
-	@Autowired
-	private UserSistemaRepository userSistemaRepository;
-	
+@RequestMapping("/avaliacions")
+@CrossOrigin
+public class AvaliacionAlunoController {
 
-	@GetMapping("/avaliacions")
-	@CrossOrigin
-	public Iterable<AvaliandoALuno> AvaliandoAluno() {
-		return Aar.findAll();
-	}
-	
-	
-	@GetMapping("/avaliacions/todas/{codigo}")
-	@CrossOrigin
-	public ResponseEntity<List<AvaliandoALuno>> getAvaliacoesPorAluno(@PathVariable Long codigo) {
+    @Autowired
+    private AvaliacionALunoRepository Aar;
 
-	    List<AvaliandoALuno> avaliacoes = Aar.findByAluno_Codigo(codigo);
+    @Autowired
+    private UserSistemaRepository userSistemaRepository;
 
-	    if (!avaliacoes.isEmpty()) {
-	        return ResponseEntity.ok(avaliacoes);
-	    } else {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-	    }
-	}
-	
-	
-	
-	@GetMapping("/avaliacions/{idavalicacion}/{codigo}")
-	@CrossOrigin
-	public ResponseEntity<List<AvaliandoALuno>> ReceberAvaliacaoPorUser(@PathVariable Long idavalicacion, UserSistema codigo) {
-
-		
-	    Optional<List<AvaliandoALuno>> AvalindoUno = Optional.ofNullable(Aar.findByIdavalicacionAndAluno(idavalicacion, codigo));
-
-	    if (AvalindoUno.isPresent()) {
-	        return ResponseEntity.ok(AvalindoUno.get());
-	    } else {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-	    }
-
-}
-	
-
-	
-
-	@PostMapping("/avaliacions")
-    @CrossOrigin
-    public ResponseEntity<String> inserirConceito(@RequestBody AvaliandoALuno avaliandoALuno) {
-        // Busca o aluno no banco para garantir que ele esteja sendo gerenciado pelo Hibernate
-        UserSistema aluno = userSistemaRepository.findById(avaliandoALuno.getAluno().getCodigo())
-            .orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado"));
-
-        // Atribui o aluno (que agora está gerenciado) à avaliação
-        avaliandoALuno.setAluno(aluno);
-
-        // Salva a avaliação no banco de dados
-        Aar.save(avaliandoALuno);
-
-        // Retorna uma resposta de sucesso
-        return ResponseEntity.status(HttpStatus.CREATED).body("Avaliação inserida com sucesso");
+    private ResponseEntity<Map<String, Object>> createResponse(HttpStatus status, String message, Object data) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", status.value());
+        response.put("message", message);
+        response.put("data", data);
+        return new ResponseEntity<>(response, status);
     }
-	
 
-	@PatchMapping("/avaliacions/{idavalicacion}")
-	@CrossOrigin
-	public ResponseEntity<String> updateUser(@PathVariable Long idavalicacion, @RequestBody Map<String, Object> updates) {
-	        Optional<AvaliandoALuno> optionavaliando = Optional.ofNullable(Aar.findByidavalicacion(idavalicacion));
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> listarAvaliacoes() {
+        List<AvaliandoALuno> avaliacoes = (List<AvaliandoALuno>) Aar.findAll();
+        if (avaliacoes.isEmpty()) {
+            return createResponse(HttpStatus.NOT_FOUND, "Nenhuma avaliação encontrada", null);
+        }
+        return createResponse(HttpStatus.OK, "Avaliações encontradas", avaliacoes);
+    }
 
-	        if (optionavaliando.isPresent()) {
-	        	AvaliandoALuno avaliando = optionavaliando.get();
+    @GetMapping("/todas/{codigo}")
+    public ResponseEntity<Map<String, Object>> getAvaliacoesPorAluno(@PathVariable Long codigo) {
+        List<AvaliandoALuno> avaliacoes = Aar.findByAluno_Codigo(codigo);
+        if (avaliacoes.isEmpty()) {
+            return createResponse(HttpStatus.NOT_FOUND, "Nenhuma avaliação encontrada para este aluno", null);
+        }
+        return createResponse(HttpStatus.OK, "Avaliações encontradas", avaliacoes);
+    }
 
-	            updates.forEach((key, value) -> {
-	                try {
-	                    if (value instanceof Map) {
-	                        // Se o valor for um Map, então faz o tipo aninhado para tratar o objeto tipo turma
-	                        Map<String, Object> nestedObject = (Map<String, Object>) value;
-	                        Field field = ReflectionUtils.findRequiredField(UserSistema.class, key);
-	                        if (field != null) {
-	                            field.setAccessible(true);
-	                            Object nestedInstance = field.getType().newInstance();
-	                            nestedObject.forEach((nestedKey, nestedValue) -> {
-	                                try {
-	                                    Field nestedField = ReflectionUtils.findRequiredField(nestedInstance.getClass(), nestedKey);
-	                                    if (nestedField != null) {
-	                                        nestedField.setAccessible(true);
-	                                        // Conversão de Integer para Long se necessário
-	                                        if (nestedField.getType().equals(Long.class) && nestedValue instanceof Integer) {
-	                                            nestedValue = Long.valueOf((Integer) nestedValue);
-	                                        }
-	                                        ReflectionUtils.setField(nestedField, nestedInstance, nestedValue);
-	                                    }
-	                                } catch (Exception e) {
-	                                    throw new RuntimeException("Erro ao atualizar o campo aninhado: " + nestedKey, e);
-	                                }
-	                            });
-	                            ReflectionUtils.setField(field, avaliando, nestedInstance);
-	                        }
-	                    } else {
-	                        // Atualiza os campos simples
-	                        Field field = ReflectionUtils.findRequiredField(UserSistema.class, key);
-	                        if (field != null) {
-	                            field.setAccessible(true);
-	                            // Conversão de Integer para Long se necessário
-	                            if (field.getType().equals(Long.class) && value instanceof Integer) {
-	                                value = Long.valueOf((Integer) value);
-	                            }
-	                            ReflectionUtils.setField(field, avaliando, value);
-	                        } else {
-	                            throw new NoSuchFieldException("Campo não encontrado: " + key);
-	                        }
-	                    }
-	                } catch (Exception e) {
-	                    throw new RuntimeException("Erro ao atualizar o campo: " + key, e);
-	                }
-	            });
+    @GetMapping("/{idavalicacion}/{codigo}")
+    public ResponseEntity<Map<String, Object>> ReceberAvaliacaoPorUser(@PathVariable Long idavalicacion, UserSistema codigo) {
+        Optional<List<AvaliandoALuno>> AvalindoUno = Optional.ofNullable(Aar.findByIdavalicacionAndAluno(idavalicacion, codigo));
+        if (AvalindoUno.isEmpty() || AvalindoUno.get().isEmpty()) {
+            return createResponse(HttpStatus.NOT_FOUND, "Avaliação não encontrada para o aluno especificado", null);
+        }
+        return createResponse(HttpStatus.OK, "Avaliação encontrada", AvalindoUno.get());
+    }
 
-	            Aar.save(avaliando);
-	            return ResponseEntity.status(HttpStatus.OK).body("Avaliação atualizada com sucesso");
-	        } else {
-	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avaliação não encontrado");
-	        }
-	}
-	
-	
-	@DeleteMapping("/avaliacions/{idavalicacion}")
-	@CrossOrigin
-	public ResponseEntity<String> userDelet(@PathVariable Long idavalicacion) {
-	    if (Aar.existsById(idavalicacion)) {
-	        Aar.deleteById(idavalicacion);
-	        return ResponseEntity.status(HttpStatus.OK).body("Avaliação deletado com sucesso");
-	    } else {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Avaliação não encontrado");
-	    }
-	}
+    @PostMapping
+    public ResponseEntity<Map<String, Object>> inserirConceito(@RequestBody AvaliandoALuno avaliandoALuno) {
+        try {
+            UserSistema aluno = userSistemaRepository.findById(avaliandoALuno.getAluno().getCodigo())
+                    .orElseThrow(() -> new EntityNotFoundException("Aluno não encontrado"));
+            avaliandoALuno.setAluno(aluno);
+            Aar.save(avaliandoALuno);
+            return createResponse(HttpStatus.CREATED, "Avaliação inserida com sucesso", avaliandoALuno);
+        } catch (EntityNotFoundException e) {
+            return createResponse(HttpStatus.NOT_FOUND, e.getMessage(), null);
+        } catch (Exception e) {
+            return createResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao inserir avaliação", e.getMessage());
+        }
+    }
 
+    @PatchMapping("/{idavalicacion}")
+    public ResponseEntity<Map<String, Object>> atualizarAvaliacao(@PathVariable Long idavalicacion, @RequestBody Map<String, Object> updates) {
+        try {
+            AvaliandoALuno avaliando = Aar.findByidavalicacion(idavalicacion);
+            if (avaliando == null) {
+                return createResponse(HttpStatus.NOT_FOUND, "Avaliação não encontrada", null);
+            }
+
+            updates.forEach((key, value) -> {
+                try {
+                    Field field = ReflectionUtils.findField(AvaliandoALuno.class, key);
+                    if (field != null) {
+                        field.setAccessible(true);
+                        // Conversão automática de Integer para Long, se necessário
+                        if (field.getType().equals(Long.class) && value instanceof Integer) {
+                            value = Long.valueOf((Integer) value);
+                        }
+                        ReflectionUtils.setField(field, avaliando, value);
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException("Erro ao atualizar o campo: " + key, e);
+                }
+            });
+
+            Aar.save(avaliando);
+            return createResponse(HttpStatus.OK, "Avaliação atualizada com sucesso", avaliando);
+        } catch (RuntimeException e) {
+            return createResponse(HttpStatus.BAD_REQUEST, e.getMessage(), null);
+        } catch (Exception e) {
+            return createResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao atualizar avaliação", e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{idavalicacion}")
+    public ResponseEntity<Map<String, Object>> deletarAvaliacao(@PathVariable Long idavalicacion) {
+        try {
+            if (Aar.existsById(idavalicacion)) {
+                Aar.deleteById(idavalicacion);
+                return createResponse(HttpStatus.OK, "Avaliação deletada com sucesso", null);
+            } else {
+                return createResponse(HttpStatus.NOT_FOUND, "Avaliação não encontrada", null);
+            }
+        } catch (Exception e) {
+            return createResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Erro ao deletar avaliação", e.getMessage());
+        }
+    }
 }

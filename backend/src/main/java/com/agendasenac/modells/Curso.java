@@ -8,55 +8,61 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Curso")
-public class Curso implements Serializable{
-	
-	private static final long serialVersionUID = 1L;
-	
-	@Column(name = "idcursos")
-	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
-	private Long idcursos;
-	
-	@Column(name = "nomecurso")
-	private String nomecurso;
-	
-	@Column(name = "datalhescurso")
-	private String datalhescurso;
-	
+public class Curso implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
-	public Long getIdcursos() {
-		return idcursos;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "idCurso")
+    private Long idCurso;
 
-	public void setIdcursos(Long idcursos) {
-		this.idcursos = idcursos;
-	}
+    @Column(name = "nomeCurso")
+    private String nomeCurso;
 
-	public String getNomecurso() {
-		return nomecurso;
-	}
+    @Column(name = "detalhesCurso")
+    private String detalhesCurso;
 
-	public void setNomecurso(String nomecurso) {
-		this.nomecurso = nomecurso;
-	}
+    // Relacionamento de 1:N com Disciplinas
+    @OneToMany(mappedBy = "curso") // 'curso' é a referência na classe Disciplinas
+    private List<Disciplinas> disciplinas;
 
-	public String getDatalhescurso() {
-		return datalhescurso;
-	}
+    // Getters e setters
 
-	public void setDatalhescurso(String datalhescurso) {
-		this.datalhescurso = datalhescurso;
-	}
-	
-	
-	
-	
-	
+    public List<Disciplinas> getDisciplinas() {
+        return disciplinas;
+    }
 
+    public void setDisciplinas(List<Disciplinas> disciplinas) {
+        this.disciplinas = disciplinas;
+    }
+
+    public Long getIdCurso() {
+        return idCurso;
+    }
+
+    public void setIdCurso(Long idCurso) {
+        this.idCurso = idCurso;
+    }
+
+    public String getNomeCurso() {
+        return nomeCurso;
+    }
+
+    public void setNomeCurso(String nomeCurso) {
+        this.nomeCurso = nomeCurso;
+    }
+
+    public String getDetalhesCurso() {
+        return detalhesCurso;
+    }
+
+    public void setDetalhesCurso(String detalhesCurso) {
+        this.detalhesCurso = detalhesCurso;
+    }
 }

@@ -43,7 +43,7 @@ public class DisciplinasController {
 	@GetMapping("/disciplinas/{idDisciplina}")
 	@CrossOrigin
 	public ResponseEntity<Disciplinas> RetornandoUmadiciplina(@PathVariable Long idDisciplina){
-		Optional<Disciplinas> disiciplias = Optional.ofNullable(dr.findByidDisciplina(idDisciplina));
+		Optional<Disciplinas> disiciplias = Optional.ofNullable(dr.findByIdDisciplina(idDisciplina));
 		
 		if (disiciplias.isPresent()) {
 	        return ResponseEntity.ok(disiciplias.get());
@@ -73,7 +73,7 @@ public class DisciplinasController {
 	public ResponseEntity<List<Disciplinas>> RetornandoAsDisciplinasProfessorTurma(
 	        @PathVariable Long codigo,
 	        @PathVariable Long idturma) {
-	    List<Disciplinas> disciplinas = dr.findByProfessorCodigoTurma(codigo, idturma);
+	    List<Disciplinas> disciplinas = dr.findByProfessorCodigoAndCursoId(codigo, idturma);
 	    
 	    if (!disciplinas.isEmpty()) {
 	        return ResponseEntity.ok(disciplinas);
@@ -117,7 +117,7 @@ public class DisciplinasController {
 	@PatchMapping("/disciplinas/{idDisciplina}")
 	@CrossOrigin
 	public ResponseEntity<String> atualizarTurma(@PathVariable Long idDisciplina, @RequestBody Map<String, Object> updates) {
-	    Optional<Disciplinas> optionoptionaldisciplinaalTurma = Optional.ofNullable(dr.findByidDisciplina(idDisciplina));
+	    Optional<Disciplinas> optionoptionaldisciplinaalTurma = Optional.ofNullable(dr.findByIdDisciplina(idDisciplina));
 	    
 	    if (optionoptionaldisciplinaalTurma.isPresent()) {
 	    	Disciplinas disciplinas = optionoptionaldisciplinaalTurma.get();

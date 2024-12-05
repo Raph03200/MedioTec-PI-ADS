@@ -45,8 +45,10 @@ public class LoginController {
                 // Cria uma string com os dados do usuário que você deseja retornar
                 String Nome = usuario.getNomeCompletoUser();
                 RegraUsers Tipo = usuario.getTipoUser();
+                Long idusuaip = usuario.getCodigo();
                 response.put("NomeUsuario", Nome); 
                 response.put("TipoUser", "" + Tipo );
+                response.put("IdUser", "" + idusuaip);
             } else {
                 response.put("DadosUser", "Usuário não encontrado"); // Mensagem se não encontrar
             }
