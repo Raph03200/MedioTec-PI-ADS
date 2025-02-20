@@ -65,7 +65,7 @@ npm run build
 * **Brendo Garcia** - *Desenvolvedor Back-End* - [Brendo Garcia](https://github.com/BrendoGarcia)
 * **Leandro Marques** - *Admnistrador de Banco de Dados* - [Leandro Marques](https://github.com/leandromrtk)
 * **Lucas Santiago** - *Desenvolvedor Mobile* - [Lucas Santiago](https://github.com/M6488)
-* **Luiz Reis** - *UX Designer* - [Luiz Reis](https://github.com/Luizreis3d)
+* **Luiz Reis** - *UX/UI Designer* - [Luiz Reis](https://github.com/Luizreis3d)
 * **Raphael Façanha** - *Documentação* - [Raphael Façanha](https://github.com/Raph03200)
 
 ## 📄 Licença
